@@ -22,6 +22,13 @@ namespace MMABooksTests
         {
             dbContext = new MMABooksContext();
             dbContext.Database.ExecuteSqlRaw("call usp_testingResetData()");
+            var oregon = dbContext.States.Find("OR");
+
+            if (oregon != null && oregon.StateName != "Ore")
+            {
+                oregon.StateName = "Ore";
+                dbContext.SaveChanges();
+            }
         }
 
         [Test]
@@ -64,10 +71,19 @@ namespace MMABooksTests
         [Test]
         public void DeleteTest()
         {
-            s = dbContext.States.Find("HI");
+            s = new State
+            {
+                StateCode = "ZZ",
+                StateName = "Test State"
+            };
+
+            dbContext.States.Add(s);
+            dbContext.SaveChanges();
+
             dbContext.States.Remove(s);
             dbContext.SaveChanges();
-            Assert.IsNull(dbContext.States.Find("HI"));
+
+            Assert.IsNull(dbContext.States.Find("ZZ"));
         }
 
         [Test]
@@ -79,7 +95,8 @@ namespace MMABooksTests
         [Test]
         public void UpdateTest()
         {
-
+            s.StateName = "Ore";
+            dbContext.SaveChanges();
         }
 
         public void PrintAll(List<State> states)
